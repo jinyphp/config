@@ -8,8 +8,8 @@ class PHP
 
     public function __construct($conf)
     {
-        echo "<hr>";
-        echo __CLASS__."를 생성합니다.<br>";
+        //echo "<hr>";
+        //echo __CLASS__."를 생성합니다.<br>";
         $this->Config = $conf;
     }
     
