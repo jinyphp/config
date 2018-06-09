@@ -5,8 +5,9 @@ namespace Jiny\Config;
 /**
  * 싱글톤 방식으로 동작합니다.
  */
-class Config 
+class Config extends ConfigAbstract
 {
+
     private function __construct()
     {
         // 싱글톤
@@ -17,13 +18,9 @@ class Config
         // 싱글톤
     }
 
-
     // 인스턴스 저장 프로퍼티
     private static $_instance;
-
-    // 설정값을 저장하는 프로퍼티
-    private $_config=[];
-    private $_load=[];
+    public $Drivers;
 
     // 싱글톤 인스턴스를 생성
     // 메소드 처리입니다.
@@ -36,8 +33,13 @@ class Config
             //echo "인스턴스를 생성합니다.<br>";     
             self::$_instance = new self();
 
+            // 드라이버를 로드합니다.
+            self::$_instance->Drivers['Yaml'] = new \Jiny\Config\Drivers\Yaml(self::$_instance);
+            self::$_instance->Drivers['INI'] = new \Jiny\Config\Drivers\INI(self::$_instance);
+            self::$_instance->Drivers['PHP'] = new \Jiny\Config\Drivers\PHP(self::$_instance);
+
             //Debug::out("기본 환경 설정값을 읽어 옵니다.");
-            self::$_instance->_config['ENV'] = self::loadPHPReturn(".env", "..".DS);
+            self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->loadPHP(".env", "..".DS);
 
             return self::$_instance;
 
@@ -52,9 +54,13 @@ class Config
         return $this->data($key);
     }
 
+    /**
+     * 지정한 key의 데이터를 읽어옵니다.
+     */
     public function data($key=NULL)
     {
         if ($key) {
+            // 닷(.)을 이용하여 배열값을 분리합니다.
             $a = \explode(".",$key);
             $v = $this->_config;
             foreach ($a as $value){
@@ -67,12 +73,40 @@ class Config
         }        
     }
 
+    /**
+     * 지정한 값을 저장합니다.
+     */
     public function set($key, $value)
     {
         $this->_config[$key] = $value;
     }
 
+    
+    
 
+    // 전체 설정값을 읽어 옵니다.
+    public function parser()
+    {
+        $path = rtrim($this->_config['ENV']['conf'], "/")."/";
+        foreach ($this->_load as $key => $value) {
+            switch ($value) {
+                case 'ini':
+                    //echo "ini 설정파일을 읽어 읽습니다.<br>";
+                    $this->_config[$key] = $this->Drivers['INI']->loadINI($key, $path);
+                    break;
+                case 'yml':
+                    // Yaml 데이터를 읽어옵니다.
+                    $this->_config[$key] = $this->Drivers['Yaml']->loadYaml($key, $path);
+                    break;    
+                case 'php':
+                    //echo "php 설정파일을 읽어 읽습니다.<br>";
+                    $this->_config[$key] = $this->Drivers['PHP']->loadPHP($key, $path);
+                    break;    
+            }
+        }
+        
+        return $this;
+    }
 
     /**
      * 설정파일을 자동등록 합니다.
@@ -106,94 +140,13 @@ class Config
     }
 
 
-    // 전체 설정값을 읽어 옵니다.
-    public function load()
-    {
-        //Debug::out("전체 설정파일을 읽어옵니다.");
-        $path = rtrim($this->_config['ENV']['conf'], "/")."/";
-        foreach ($this->_load as $key => $value) {
-            switch ($value) {
-                case 'ini':
-                    //echo "ini 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->loadINI($key, $path);
-                    break;
-                case 'yml':
-                    break;    
-                case 'php':
-                    //echo "php 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->loadPHPReturn($key, $path);
-                    break;    
-            }
-        }
-        
-        return $this;
-    }
-
     /**
      * 읽어올 환경설정 파일을 설정합니다.
      */
     public function setLoad($filename){
-        //Debug::out($filename." 설정파일을 등록합니다.");
-
         $parts = pathinfo($filename);
         $this->_load[ $parts['filename'] ] = $parts['extension'];
         return $this;
-    }
-
-
-
-
-
-    /**
-     * PHP Return 배열로 된 설정값을 읽어 옵니다.
-     * [
-     *  "name"=>"aaa"
-     * ]
-     */
-    public function loadPHPReturn($name, $path=NULL)
-    {
-        if ($name) {
-            if ($path) {
-                $filename = $path.$name.".php";
-            } else {
-                $filename = $name.".php";
-            }
-
-            if (file_exists($filename)) {
-                //Debug::out(">>>".$filename." 설정값을 읽어 옵니다.");
-                return include ($filename);
-            } else {
-                // 파일이 존재하지 않습니다.
-                //Debug::out(">>>파일이 존재하지 않습니다.");
-            }            
-        } else {
-            // 파일 이름이 없습니다.
-        }
-    }
-
-    // ini 설정파일을 로드합니다.
-    public function loadINI($name, $path=NULL)
-    {
-        if ($name) {
-            if ($path) {
-                $filename = $path.$name.".ini";
-            } else {
-                $filename = $name."ini";
-            }
-            //echo "ini 파일 = ".$filename."<br>";
-
-            if (\file_exists($filename)) {
-                //Debug::out(">>>".$name." 설정값을 읽어 옵니다.");
-                $str = file_get_contents($filename);           
-                return \parse_ini_string($str);       
-            } else {
-                // 파일이 없습니다.
-                Debug::out(">>>파일이 존재하지 않습니다.");
-            }            
-        } else {
-            // 이름이 없습니다.
-        }
-
     }
 
 }
