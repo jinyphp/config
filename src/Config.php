@@ -26,11 +26,12 @@ class Config extends ConfigAbstract
     // 메소드 처리입니다.
     public static function instance()
     {
+        //echo "인스턴스를 생성합니다.<br>"; 
+
         if (!isset(self::$_instance)) {
                    
             // 인스턴스를 생성합니다.
-            // 자기 자신의 인스턴스를 생성합니다.
-            //echo "인스턴스를 생성합니다.<br>";     
+            // 자기 자신의 인스턴스를 생성합니다.                
             self::$_instance = new self();
 
             // 드라이버를 로드합니다.
@@ -39,7 +40,7 @@ class Config extends ConfigAbstract
             self::$_instance->Drivers['PHP'] = new \Jiny\Config\Drivers\PHP(self::$_instance);
 
             //Debug::out("기본 환경 설정값을 읽어 옵니다.");
-            self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->loadPHP(".env", "..".DS);
+            self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->loadPHP(".env", ROOT.DS);
 
             return self::$_instance;
 
@@ -87,7 +88,9 @@ class Config extends ConfigAbstract
     // 전체 설정값을 읽어 옵니다.
     public function parser()
     {
-        $path = rtrim($this->_config['ENV']['conf'], "/")."/";
+        $path = rtrim($this->_config['ENV']['path']['conf'], "/")."/";
+        $path = ROOT.str_replace("/",DS,$path);
+
         foreach ($this->_load as $key => $value) {
             switch ($value) {
                 case 'ini':
@@ -114,8 +117,11 @@ class Config extends ConfigAbstract
      */
     public function autoUpFiles()
     {
+        //echo __METHOD__."<br>";
         //echo "환경설정 파일을 자동 로드합니다.<br>";
-        $pathDir = $this->_config['ENV']['conf'];
+     
+        $pathDir = ROOT.$this->_config['ENV']['path']['conf'];
+        //echo $pathDir."<br>";
 
         if (is_dir($pathDir)) {
             //echo "OK] $pathDir 디렉터리 작업이 가능합니다.<br>";
@@ -135,6 +141,7 @@ class Config extends ConfigAbstract
         } else {
             //echo "Err] $pathDir 디렉터리가 존재하지 않습니다.<br>";
         }
+       
 
         return $this;
     }

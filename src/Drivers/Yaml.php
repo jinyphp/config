@@ -34,11 +34,20 @@ class Yaml
                 return $this->processor->parse($string);  
 
             } else {
-                echo "Yaml 파일이 없습니다.<br>"; 
+                echo "Yaml 파일($path $name)이 없습니다.<br>"; 
 
             }            
         } else {
             // 이름이 없습니다.
         }
+    }
+
+    public function parser($string)
+    {   
+        // echo __METHOD__."<br>";
+        if ($string) {
+            return $this->processor->parse($string); 
+        }
+        
     }
 }
