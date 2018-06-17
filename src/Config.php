@@ -20,10 +20,17 @@ class Config extends ConfigAbstract
 
     // 인스턴스 저장 프로퍼티
     private static $_instance;
-    public $Drivers;
 
-    // 싱글톤 인스턴스를 생성
-    // 메소드 처리입니다.
+    /**
+     * 드라이버 인스턴스를 관리하는 배열입니다.
+     * INI, YMAL, PHP등
+     */
+    public $Drivers;
+    
+    /**
+     * 설정파일의 인스턴스를 생성합니다.
+     * 싱글톤으로 별도의 생성 메서드를 가지고 있습니다.
+     */
     public static function instance()
     {
         //echo "인스턴스를 생성합니다.<br>"; 
@@ -62,16 +69,17 @@ class Config extends ConfigAbstract
     {
         if ($key) {
             // 닷(.)을 이용하여 배열값을 분리합니다.
-            $a = \explode(".",$key);
-            $v = $this->_config;
-            foreach ($a as $value){
-                $v = $v[$value];
-            }
-            return $v;
+            $value = \explode(".", $key);
+
+            $arr = $this->_config;
+            foreach ($value as $name){
+                if (isset($arr[$name])) $arr = $arr[$name];               
+            }           
+            return $arr;
 
         } else {
             return $this->_config;
-        }        
+        }
     }
 
     /**
