@@ -2,14 +2,21 @@
 
 namespace Jiny\Config\Drivers;
 
+/**
+ * jiny 
+ * php 설정파일 드라이버
+ *
+ */
 class PHP
 {
     private $Config;
 
     public function __construct($conf)
     {
-        //echo "<hr>";
-        //echo __CLASS__."를 생성합니다.<br>";
+        // \TimeLog::set(__CLASS__."가 생성이 되었습니다.");
+
+        // 의존성 주입
+        // 호출된 config 클래스의 인스턴스르 저장합니다.
         $this->Config = $conf;
     }
     
@@ -21,6 +28,7 @@ class PHP
      */
     public function loadPHP($name, $path=NULL)
     {
+        // \TimeLog::set(__METHOD__);
         if ($name) {
             if ($path) {
                 $filename = $path.$name.".php";

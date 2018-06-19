@@ -3,7 +3,9 @@
 namespace Jiny\Config;
 
 /**
- * 싱글톤 방식으로 동작합니다.
+ * jiny 
+ * 설정파일을 읽어 처리합니다.
+ * 디자인패턴: 싱글톤
  */
 class Config extends ConfigAbstract
 {
@@ -18,7 +20,9 @@ class Config extends ConfigAbstract
         // 싱글톤
     }
 
-    // 인스턴스 저장 프로퍼티
+    /**
+     * 인스턴스 저장 프로퍼티
+     */
     private static $_instance;
 
     /**
@@ -87,11 +91,14 @@ class Config extends ConfigAbstract
      */
     public function set($key, $value)
     {
-        $this->_config[$key] = $value;
-    }
+        if($key){
+            // 닷(.)을 이용하여 배열값을 분리합니다.
+            $k = \explode(".", $key);
 
-    
-    
+            $this->_config[$key] = $value;
+        }
+        return $this;        
+    }
 
     // 전체 설정값을 읽어 옵니다.
     public function parser()

@@ -5,6 +5,11 @@ namespace Jiny\Config\Drivers;
 use Webuni\FrontMatter\Processor\ProcessorInterface;
 use Webuni\FrontMatter\Processor\YamlProcessor;
 
+/**
+ * jiny 
+ * ymal 설정파일 드라이버
+ *
+ */
 class Yaml
 {
     private $Config;
@@ -12,8 +17,10 @@ class Yaml
 
     public function __construct($conf)
     {
-        //echo "<hr>";
-        //echo __CLASS__."를 생성합니다.<br>";
+        // \TimeLog::set(__CLASS__."가 생성이 되었습니다.");
+
+        // 의존성 주입
+        // 호출된 config 클래스의 인스턴스르 저장합니다.
         $this->Config = $conf;
 
         // Yaml 처리 인스턴스를 생성합니다.
@@ -22,6 +29,7 @@ class Yaml
 
     public function loadYaml($name, $path=NULL)
     {
+        // \TimeLog::set(__METHOD__);
         if ($name) {
             if ($path) {
                 $filename = $path.$name.".yml";
@@ -44,7 +52,7 @@ class Yaml
 
     public function parser($string)
     {   
-        // echo __METHOD__."<br>";
+        // \TimeLog::set(__METHOD__);
         if ($string) {
             return $this->processor->parse($string); 
         }
