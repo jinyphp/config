@@ -8,7 +8,8 @@ namespace Jiny\Config;
 abstract class ConfigAbstract 
 {
     /**
-     * 설정된 값을 통합 저장되는 배열입니다.
+     * 설정값
+     * 모든 값이 저장되어 있습니다.
      */
     protected $_config=[];
 

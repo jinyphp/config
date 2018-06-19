@@ -37,7 +37,7 @@ class Config extends ConfigAbstract
      */
     public static function instance()
     {
-        //echo "인스턴스를 생성합니다.<br>"; 
+        //echo "인스턴스를 생성합니다.<br>";
 
         if (!isset(self::$_instance)) {
                    
@@ -49,6 +49,9 @@ class Config extends ConfigAbstract
             self::$_instance->Drivers['Yaml'] = new \Jiny\Config\Drivers\Yaml(self::$_instance);
             self::$_instance->Drivers['INI'] = new \Jiny\Config\Drivers\INI(self::$_instance);
             self::$_instance->Drivers['PHP'] = new \Jiny\Config\Drivers\PHP(self::$_instance);
+
+            // 시작위치를 지정합니다.
+            self::$_instance->_config['ROOT'] = ROOT_PUBLIC;
 
             //Debug::out("기본 환경 설정값을 읽어 옵니다.");
             self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->loadPHP(".env", ROOT.DS);
