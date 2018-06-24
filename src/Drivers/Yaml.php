@@ -2,9 +2,6 @@
 
 namespace Jiny\Config\Drivers;
 
-use Webuni\FrontMatter\Processor\ProcessorInterface;
-use Webuni\FrontMatter\Processor\YamlProcessor;
-
 /**
  * jiny 
  * ymal 설정파일 드라이버
@@ -13,7 +10,6 @@ use Webuni\FrontMatter\Processor\YamlProcessor;
 class Yaml
 {
     private $Config;
-    private $processor;
 
     public function __construct($conf)
     {
@@ -22,9 +18,6 @@ class Yaml
         // 의존성 주입
         // 호출된 config 클래스의 인스턴스르 저장합니다.
         $this->Config = $conf;
-
-        // Yaml 처리 인스턴스를 생성합니다.
-        $this->processor = new YamlProcessor();
     }
 
     public function loadYaml($name, $path=NULL)
@@ -39,7 +32,7 @@ class Yaml
 
             if (\file_exists($filename)) {
                 $string = file_get_contents($filename);
-                return $this->processor->parse($string);  
+                return $this->parser($string);  
 
             } else {
                 echo "Yaml 파일($path $name)이 없습니다.<br>"; 
@@ -54,8 +47,25 @@ class Yaml
     {   
         // \TimeLog::set(__METHOD__);
         if ($string) {
-            return $this->processor->parse($string); 
-        }
-        
+            //return \Symfony\Component\Yaml\Yaml::parse($string);
+            return \Jiny\Config\Yaml::parse($string);
+        }        
     }
+
+    /**
+     * 
+     */
+    public function dump($data)
+    {
+        if (is_array($data) && empty($data)) {
+            return '';
+        }
+
+        //return \Symfony\Component\Yaml\Yaml::dump($data);
+        return \Jiny\Config\Yaml::dump($data);
+    }
+
+    /**
+     * 
+     */
 }
