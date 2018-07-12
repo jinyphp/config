@@ -7,8 +7,27 @@ namespace Jiny\Config;
  * 설정파일을 읽어 처리합니다.
  * 디자인패턴: 싱글톤
  */
-class Config extends ConfigAbstract
+class Config
 {
+
+    /**
+     * 설정값
+     * 모든 값이 저장되어 있습니다.
+     */
+    protected $_config=[];
+
+    /**
+     * 설정 파일의 목록을 가지고 있습니다.
+     * ./conf/ 디렉토리의 파일들을 읽어 옵니다.
+     * Key 값는 설정파일의 이름으로 처리됩니다.
+     * 파일명이 '_'로 시작되는 경우 처리되지 않습니다. 
+     */
+    protected $_load=[];
+
+    /**
+     * 설정파일 목록을 지정합니다.
+     */
+    protected $_file=[];
 
     private function __construct()
     {
@@ -103,7 +122,23 @@ class Config extends ConfigAbstract
         return $this;        
     }
 
-    // 전체 설정값을 읽어 옵니다.
+    /**
+     * 값을 추가합니다.
+     * @value = array
+     */
+    public function append(string $key, array $value)
+    {
+        if($key){
+            foreach ($value as $k => $v) {
+                $this->_config[$key][$k] = $v;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * 설정파일을 파싱 로드합니다.
+     */
     public function parser()
     {
         $path = rtrim($this->_config['ENV']['path']['conf'], "/")."/";
@@ -160,7 +195,6 @@ class Config extends ConfigAbstract
             //echo "Err] $pathDir 디렉터리가 존재하지 않습니다.<br>";
         }
        
-
         return $this;
     }
 
@@ -169,8 +203,54 @@ class Config extends ConfigAbstract
      * 읽어올 환경설정 파일을 설정합니다.
      */
     public function setLoad($filename){
+        // 파일명과 확장자를 확인합니다.
         $parts = pathinfo($filename);
         $this->_load[ $parts['filename'] ] = $parts['extension'];
+        return $this;
+    }
+
+    /**
+     * 로딩할 설정파일을 지정합니다.
+     */
+    public function setFile($filename, $key=NULL)
+    {
+        if ($key) {
+            $this->_file[$key] = $filename;
+        } else {
+            $parts = pathinfo($filename);
+            $this->_file[ $parts['filename'] ] = $filename;
+        }
+    }
+
+    public function loadFiles()
+    {
+        $path = rtrim($this->_config['ENV']['path']['conf'], "/")."/";
+        $path = ROOT.str_replace("/",DS,$path);
+
+        foreach ($this->_file as $key => $name) {
+            // echo "$key $name<br>";
+            $parts = pathinfo($name);
+
+            switch ($parts['extension']) {
+                case 'ini':
+                    //echo "ini 설정파일을 읽어 읽습니다.<br>";
+                    $this->_config[$key] = $this->Drivers['INI']->loadINI($parts['filename'], $path);
+                    break;
+                case 'yml':
+                    // Yaml 데이터를 읽어옵니다.
+                    $this->_config[$key] = $this->Drivers['Yaml']->loadYaml($parts['filename'], $path);
+                    break;    
+                case 'php':
+                    //echo "php 설정파일을 읽어 읽습니다.<br>";
+                    $this->_config[$key] = $this->Drivers['PHP']->loadPHP($parts['filename'], $path);
+                    break;    
+            }
+     
+        
+        
+
+        }
+
         return $this;
     }
 

@@ -20,5 +20,10 @@ abstract class ConfigAbstract
      * 파일명이 '_'로 시작되는 경우 처리되지 않습니다. 
      */
     protected $_load=[];
+
+    /**
+     * 설정파일 목록을 지정합니다.
+     */
+    protected $_file=[];
     
 }

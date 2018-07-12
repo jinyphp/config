@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Yaml;
+namespace Jiny\Config\Yaml;
 
 use Symfony\Component\Yaml\Exception\ParseException;
 

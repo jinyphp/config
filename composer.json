@@ -23,6 +23,9 @@
     "autoload": {
         "psr-4": {
             "Jiny\\Config\\": "src/"
-        }
+        },
+        "files": [
+            "src/Helper/helpers.php"
+        ] 
     }
 }

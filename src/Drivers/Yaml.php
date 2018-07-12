@@ -43,17 +43,18 @@ class Yaml
         }
     }
 
+    /**
+     * Yaml 데이터를 파싱합니다.
+     */
     public function parser($string)
     {   
-        // \TimeLog::set(__METHOD__);
         if ($string) {
-            //return \Symfony\Component\Yaml\Yaml::parse($string);
-            return \Jiny\Config\Yaml::parse($string);
+            return \Jiny\Config\Yaml\Yaml::parse($string);
         }        
     }
 
     /**
-     * 
+     * 배열 데이터를 Yaml 포맷으로 전환합니다. 
      */
     public function dump($data)
     {
@@ -61,8 +62,7 @@ class Yaml
             return '';
         }
 
-        //return \Symfony\Component\Yaml\Yaml::dump($data);
-        return \Jiny\Config\Yaml::dump($data);
+        return \Jiny\Config\Yaml\Yaml::dump($data);
     }
 
     /**
