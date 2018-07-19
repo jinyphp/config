@@ -3,19 +3,17 @@
 namespace Jiny\Config\Drivers;
 
 /**
- * jiny 
  * ini 설정파일 드라이버
- *
  */
 class INI
 {
     private $Config;
 
+    /**
+     * 의존성 주입
+     */
     public function __construct($conf)
     {
-        // \TimeLog::set(__CLASS__."가 생성이 되었습니다.");
-
-        // 의존성 주입
         // 호출된 config 클래스의 인스턴스르 저장합니다.
         $this->Config = $conf;
     }

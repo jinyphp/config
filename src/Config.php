@@ -2,6 +2,8 @@
 
 namespace Jiny\Config;
 
+use \Jiny\Core\Base\File;
+
 /**
  * jiny 
  * 설정파일을 읽어 처리합니다.
@@ -79,14 +81,62 @@ class Config
 
         } else {
             // 인스턴스가 중복
-            //echo "인스턴스 중복.<br>";     
+            return self::$_instance; 
         }
     }    
 
-    public function __invoke($key=NULL)
+
+    /**
+     * 로딩할 설정파일을 지정합니다.
+     */
+    public function setFile($filename, $key=NULL)
     {
-        return $this->data($key);
+        if ($key) {
+            $this->_file[$key] = $filename;
+        } else {
+            $parts = pathinfo($filename);
+            $this->_file[ $parts['filename'] ] = $filename;
+        }
     }
+
+    /**
+     * 파일을 로드 합니다.
+     */
+    public function loadFiles()
+    {
+
+        // echo "설정파일을 로드합니다.<br>";
+
+        $path = conf("ENV.path.conf");
+        $path = rtrim($path, "/")."/";
+        $path = ROOT.File::osPath($path); 
+
+        foreach ($this->_file as $key => $name) {
+            // echo "$key $name<br>";
+            $parts = pathinfo($name);
+
+            switch ($parts['extension']) {
+                case 'ini':
+                    //echo "ini 설정파일을 읽어 읽습니다.<br>";
+                    $this->_config[$key] = $this->Drivers['INI']->loadINI($parts['filename'], $path);
+                    break;
+
+                case 'yml':
+                    // Yaml 데이터를 읽어옵니다.
+                    $this->_config[$key] = $this->Drivers['Yaml']->loadYaml($parts['filename'], $path);
+                    break; 
+
+                case 'php':
+                    //echo "php 설정파일을 읽어 읽습니다.<br>";
+                    $this->_config[$key] = $this->Drivers['PHP']->loadPHP($parts['filename'], $path);
+                    break;    
+            } 
+
+        }
+
+        return $this;
+    }
+
 
     /**
      * 지정한 key의 데이터를 읽어옵니다.
@@ -108,19 +158,56 @@ class Config
         }
     }
 
+
+
     /**
      * 지정한 값을 저장합니다.
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         if($key){
             // 닷(.)을 이용하여 배열값을 분리합니다.
             $k = \explode(".", $key);
 
-            $this->_config[$key] = $value;
+            switch(count($k)) {
+                case 5:
+                    $this->_config[ $k[0] ][ $k[1] ][ $k[2] ][ $k[3] ][ $k[4] ] = $value;
+                    break;
+
+                case 4:
+                    $this->_config[ $k[0] ][ $k[1] ][ $k[2] ][ $k[3] ] = $value;
+                    break;
+
+                case 3:
+                    $this->_config[ $k[0] ][ $k[1] ][ $k[2] ] = $value;
+                    break;
+
+                case 2:
+                    $this->_config[ $k[0] ][ $k[1] ] = $value;
+                    break;
+                case 1:
+                    $this->_config[ $k[0] ] = $value;
+                    break;
+            }
+
         }
+        
         return $this;        
     }
+
+
+
+
+
+
+
+
+    public function __invoke($key=NULL)
+    {
+        return $this->data($key);
+    }
+
+    
 
     /**
      * 값을 추가합니다.
@@ -209,49 +296,6 @@ class Config
         return $this;
     }
 
-    /**
-     * 로딩할 설정파일을 지정합니다.
-     */
-    public function setFile($filename, $key=NULL)
-    {
-        if ($key) {
-            $this->_file[$key] = $filename;
-        } else {
-            $parts = pathinfo($filename);
-            $this->_file[ $parts['filename'] ] = $filename;
-        }
-    }
-
-    public function loadFiles()
-    {
-        $path = rtrim($this->_config['ENV']['path']['conf'], "/")."/";
-        $path = ROOT.str_replace("/",DS,$path);
-
-        foreach ($this->_file as $key => $name) {
-            // echo "$key $name<br>";
-            $parts = pathinfo($name);
-
-            switch ($parts['extension']) {
-                case 'ini':
-                    //echo "ini 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->Drivers['INI']->loadINI($parts['filename'], $path);
-                    break;
-                case 'yml':
-                    // Yaml 데이터를 읽어옵니다.
-                    $this->_config[$key] = $this->Drivers['Yaml']->loadYaml($parts['filename'], $path);
-                    break;    
-                case 'php':
-                    //echo "php 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->Drivers['PHP']->loadPHP($parts['filename'], $path);
-                    break;    
-            }
-     
-        
-        
-
-        }
-
-        return $this;
-    }
+    
 
 }

@@ -3,26 +3,23 @@
 namespace Jiny\Config\Drivers;
 
 /**
- * jiny 
  * ymal 설정파일 드라이버
- *
  */
 class Yaml
 {
     private $Config;
 
+    /**
+     * 의존성 주입
+     */
     public function __construct($conf)
     {
-        // \TimeLog::set(__CLASS__."가 생성이 되었습니다.");
-
-        // 의존성 주입
         // 호출된 config 클래스의 인스턴스르 저장합니다.
         $this->Config = $conf;
     }
 
     public function loadYaml($name, $path=NULL)
     {
-        // \TimeLog::set(__METHOD__);
         if ($name) {
             if ($path) {
                 $filename = $path.$name.".yml";
