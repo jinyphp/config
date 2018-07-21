@@ -75,7 +75,14 @@ class Config
             self::$_instance->_config['ROOT'] = ROOT_PUBLIC;
 
             //Debug::out("기본 환경 설정값을 읽어 옵니다.");
-            self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->loadPHP(".env", ROOT.DS);
+            $intFile = ".env";
+            if(file_exists(ROOT.DS.$intFile.".php")){
+                self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->loadPHP($intFile, ROOT.DS);
+            } else {
+                echo "초기 환경파일 설정을 읽어 올수가 없습니다. <br>";
+                echo "시스템을 종료합니다.";
+                exit;
+            }   
 
             return self::$_instance;
 
