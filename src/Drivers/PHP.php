@@ -1,14 +1,19 @@
 <?php
-
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Config\Drivers;
 
 /**
  * php 설정파일 드라이버
  */
-class PHP
+class PHP extends \Jiny\Config\Driver
 {
-    private $Config;
-
     /**
      * 의존성 주입
      */
@@ -24,7 +29,7 @@ class PHP
      *  "name"=>"aaa"
      * ]
      */
-    public function loadPHP($name, $path=NULL)
+    public function load($name, $path=NULL)
     {
         // \TimeLog::set(__METHOD__);
         if ($name) {

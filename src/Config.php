@@ -1,11 +1,18 @@
 <?php
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Jiny\Config;
 
 use \Jiny\Core\Base\File;
 
 /**
- * jiny 
  * 설정파일을 읽어 처리합니다.
  * 디자인패턴: 싱글톤
  */
@@ -13,33 +20,14 @@ class Config
 {
 
     /**
-     * 설정값
-     * 모든 값이 저장되어 있습니다.
+     * 설정값 저장되어 있습니다.
      */
     protected $_config=[];
-
-    /**
-     * 설정 파일의 목록을 가지고 있습니다.
-     * ./conf/ 디렉토리의 파일들을 읽어 옵니다.
-     * Key 값는 설정파일의 이름으로 처리됩니다.
-     * 파일명이 '_'로 시작되는 경우 처리되지 않습니다. 
-     */
-    protected $_load=[];
 
     /**
      * 설정파일 목록을 지정합니다.
      */
     protected $_file=[];
-
-    private function __construct()
-    {
-        // 싱글톤
-    }
-
-    private function __clone()
-    {
-        // 싱글톤
-    }
 
     /**
      * 인스턴스 저장 프로퍼티
@@ -53,31 +41,31 @@ class Config
     public $Drivers;
     
     /**
-     * 설정파일의 인스턴스를 생성합니다.
-     * 싱글톤으로 별도의 생성 메서드를 가지고 있습니다.
+     * 싱글턴 인스턴스를 생성합니다.
      */
     public static function instance()
     {
-        //echo "인스턴스를 생성합니다.<br>";
-
         if (!isset(self::$_instance)) {
                    
             // 인스턴스를 생성합니다.
             // 자기 자신의 인스턴스를 생성합니다.                
             self::$_instance = new self();
 
-            // 드라이버를 로드합니다.
+            // 드라이버를 인스턴스를 로드합니다.
             self::$_instance->Drivers['Yaml'] = new \Jiny\Config\Drivers\Yaml(self::$_instance);
             self::$_instance->Drivers['INI'] = new \Jiny\Config\Drivers\INI(self::$_instance);
             self::$_instance->Drivers['PHP'] = new \Jiny\Config\Drivers\PHP(self::$_instance);
 
+
             // 시작위치를 지정합니다.
             self::$_instance->_config['ROOT'] = ROOT_PUBLIC;
 
-            //Debug::out("기본 환경 설정값을 읽어 옵니다.");
+
+            //프레임워크 설정파일을 읽어옵니다.
+            // .env.php
             $intFile = ".env";
             if(file_exists(ROOT.DS.$intFile.".php")){
-                self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->loadPHP($intFile, ROOT.DS);
+                self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->load($intFile, ROOT.DS);
             } else {
                 echo "초기 환경파일 설정을 읽어 올수가 없습니다. <br>";
                 echo "시스템을 종료합니다.";
@@ -90,7 +78,10 @@ class Config
             // 인스턴스가 중복
             return self::$_instance; 
         }
-    }    
+    }
+
+
+
 
 
     /**
@@ -99,43 +90,43 @@ class Config
     public function setFile($filename, $key=NULL)
     {
         if ($key) {
+            // 키값으로 파일설정
             $this->_file[$key] = $filename;
         } else {
+            // 키값이 없는 경우 파일명으로 설정
             $parts = pathinfo($filename);
             $this->_file[ $parts['filename'] ] = $filename;
         }
     }
+
 
     /**
      * 파일을 로드 합니다.
      */
     public function loadFiles()
     {
+        // 프레임웍 설정에서 환경설정 파일 폴더를 확인합니다.
+        $path = $this->path(); 
 
-        // echo "설정파일을 로드합니다.<br>";
-
-        $path = conf("ENV.path.conf");
-        $path = rtrim($path, "/")."/";
-        $path = ROOT.File::osPath($path); 
-
+        // 설정파일을 드라이버를 통하여 읽어들입니다.
+        // 향후 전략패턴으로 업그레이드.
         foreach ($this->_file as $key => $name) {
-            // echo "$key $name<br>";
             $parts = pathinfo($name);
 
             switch ($parts['extension']) {
                 case 'ini':
                     //echo "ini 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->Drivers['INI']->loadINI($parts['filename'], $path);
+                    $this->_config[$key] = $this->Drivers['INI']->load($parts['filename'], $path);
                     break;
 
                 case 'yml':
                     // Yaml 데이터를 읽어옵니다.
-                    $this->_config[$key] = $this->Drivers['Yaml']->loadYaml($parts['filename'], $path);
+                    $this->_config[$key] = $this->Drivers['Yaml']->load($parts['filename'], $path);
                     break; 
 
                 case 'php':
                     //echo "php 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->Drivers['PHP']->loadPHP($parts['filename'], $path);
+                    $this->_config[$key] = $this->Drivers['PHP']->load($parts['filename'], $path);
                     break;    
             } 
 
@@ -156,7 +147,12 @@ class Config
 
             $arr = $this->_config;
             foreach ($value as $name){
-                if (isset($arr[$name])) $arr = $arr[$name];               
+                if (isset($arr[$name])) {
+                    $arr = $arr[$name];
+                } else {
+                    // 일치하는 값이 없을 경우
+                    return null;
+                }               
             }           
             return $arr;
 
@@ -203,12 +199,9 @@ class Config
     }
 
 
-
-
-
-
-
-
+    /**
+     * 객체를 함수로 호출시 동작
+     */
     public function __invoke($key=NULL)
     {
         return $this->data($key);
@@ -230,59 +223,27 @@ class Config
         return $this;
     }
 
-    /**
-     * 설정파일을 파싱 로드합니다.
-     */
-    public function parser()
-    {
-        $path = rtrim($this->_config['ENV']['path']['conf'], "/")."/";
-        $path = ROOT.str_replace("/",DS,$path);
 
-        foreach ($this->_load as $key => $value) {
-            switch ($value) {
-                case 'ini':
-                    //echo "ini 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->Drivers['INI']->loadINI($key, $path);
-                    break;
-                case 'yml':
-                    // Yaml 데이터를 읽어옵니다.
-                    $this->_config[$key] = $this->Drivers['Yaml']->loadYaml($key, $path);
-                    break;    
-                case 'php':
-                    //echo "php 설정파일을 읽어 읽습니다.<br>";
-                    $this->_config[$key] = $this->Drivers['PHP']->loadPHP($key, $path);
-                    break;    
-            }
-        }
-        
-        return $this;
-    }
 
     /**
      * 설정파일을 자동등록 합니다.
-     * 설정파일은 기본 BASE.conf 설정 디렉토리 입니다.
      */
-    public function autoUpFiles()
-    {
-        //echo __METHOD__."<br>";
-        //echo "환경설정 파일을 자동 로드합니다.<br>";
-     
-        $pathDir = ROOT.$this->_config['ENV']['path']['conf'];
-        //echo $pathDir."<br>";
+    public function autoSet()
+    {   
+        // 프레임웍 설정에서 환경설정 파일 폴더를 확인합니다.
+        $pathDir = $this->path(); 
 
         if (is_dir($pathDir)) {
-            //echo "OK] $pathDir 디렉터리 작업이 가능합니다.<br>";
+            // echo "OK] $pathDir 디렉터리 작업이 가능합니다.<br>";
             $dirARR = scandir($pathDir);
             
             for ($i=0;$i<count($dirARR);$i++) {
                 // _로 시작하는 파일은 제외합니다.
                 if ($dirARR[$i][0] == "_" || $dirARR[$i][0] == ".") {
-                    //echo "파일을 제외합니다.".$dirARR[$i]."<br>";
-                } else {
-                    //echo $dirARR[$i]."<br>";
-                    $this->setLoad($dirARR[$i]);
-                }
-                
+                    // echo "파일을 제외합니다.".$dirARR[$i]."<br>";
+                } else {              
+                    $this->setFile($dirARR[$i]);
+                }                
             }
 
         } else {
@@ -292,17 +253,34 @@ class Config
         return $this;
     }
 
-
     /**
-     * 읽어올 환경설정 파일을 설정합니다.
+     * 프레임웍 설정에서 환경설정 파일 폴더를 확인합니다.
      */
-    public function setLoad($filename){
-        // 파일명과 확장자를 확인합니다.
-        $parts = pathinfo($filename);
-        $this->_load[ $parts['filename'] ] = $parts['extension'];
-        return $this;
+    public function path()
+    {
+        $path = conf("ENV.path.conf");
+        $path = rtrim($path, "/")."/";
+        return ROOT.File::osPath($path); 
     }
 
+
+
+    /**
+     * 싱글톤 처리
+     */
+    private function __construct()
+    {
+    }
+
+    /**
+     * 싱글톤 처리
+     */
+    private function __clone()
+    {
+    }
     
+    /**
+     * 
+     */
 
 }

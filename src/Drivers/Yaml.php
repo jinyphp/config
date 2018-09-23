@@ -1,13 +1,20 @@
 <?php
-
+/*
+ * This file is part of the jinyPHP package.
+ *
+ * (c) hojinlee <infohojin@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Jiny\Config\Drivers;
 
 /**
  * ymal 설정파일 드라이버
  */
-class Yaml
+class Yaml extends \Jiny\Config\Driver
 {
-    private $Config;
+    CONST EXT = "yml";
 
     /**
      * 의존성 주입
@@ -18,7 +25,7 @@ class Yaml
         $this->Config = $conf;
     }
 
-    public function loadYaml($name, $path=NULL)
+    public function load($name, $path=NULL)
     {
         if ($name) {
             if ($path) {
