@@ -22,3 +22,26 @@ if (! function_exists('conf')) {
         }
     }
 }
+
+/**
+ * 설정 객체를 반환합니다.
+ */
+if (! function_exists('config_init')) {
+    function config_init()
+    {
+        if ($conf = Registry::get("CONFIG")) {
+            return $conf;
+        }
+    }
+}
+
+/**
+ * 설정 객체를 반환합니다.
+ */
+if (! function_exists('config_set')) {
+    function config_set($key, $value)
+    {
+        $conf = config_init();
+        $conf->set($key, $value);
+    }
+}
