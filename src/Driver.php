@@ -16,5 +16,8 @@ abstract class Driver
 {
     private $Config;
 
+    /**
+     * 파일을 읽는 추상메소드 입니다.
+     */
     abstract public function load($name, $path=NULL);
 }

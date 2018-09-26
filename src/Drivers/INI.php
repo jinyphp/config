@@ -26,7 +26,6 @@ class INI extends \Jiny\Config\Driver
     // ini 설정파일을 로드합니다.
     public function load($name, $path=NULL)
     {
-        // \TimeLog::set(__METHOD__);
         if ($name) {
             if ($path) {
                 $filename = $path.$name.".ini";
@@ -46,4 +45,8 @@ class INI extends \Jiny\Config\Driver
         }
 
     }
+
+    /**
+     * 
+     */
 }

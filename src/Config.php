@@ -13,8 +13,8 @@ namespace Jiny\Config;
 use \Jiny\Core\Base\File;
 
 /**
+ * > 싱글톤
  * 설정파일을 읽어 처리합니다.
- * 디자인패턴: 싱글톤
  */
 class Config
 {
@@ -79,9 +79,6 @@ class Config
             return self::$_instance; 
         }
     }
-
-
-
 
 
     /**
@@ -162,7 +159,6 @@ class Config
     }
 
 
-
     /**
      * 지정한 값을 저장합니다.
      */
@@ -208,7 +204,6 @@ class Config
     }
 
     
-
     /**
      * 값을 추가합니다.
      * @value = array
@@ -222,7 +217,6 @@ class Config
         }
         return $this;
     }
-
 
 
     /**
@@ -253,6 +247,7 @@ class Config
         return $this;
     }
 
+
     /**
      * 프레임웍 설정에서 환경설정 파일 폴더를 확인합니다.
      */
@@ -264,12 +259,12 @@ class Config
     }
 
 
-
     /**
      * 싱글톤 처리
      */
     private function __construct()
     {
+        //
     }
 
     /**
@@ -277,6 +272,7 @@ class Config
      */
     private function __clone()
     {
+        //
     }
     
     /**

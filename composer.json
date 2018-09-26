@@ -1,8 +1,8 @@
 {
     "name": "jiny/config",
-    "description": "jiny config",
+    "description": "jinyPHP config",
     "keywords": [
-        "jiny",
+        "jinyPHP",
         "framwork",
         "config"
     ],

@@ -14,8 +14,6 @@ namespace Jiny\Config\Drivers;
  */
 class Yaml extends \Jiny\Config\Driver
 {
-    CONST EXT = "yml";
-
     /**
      * 의존성 주입
      */
@@ -39,9 +37,9 @@ class Yaml extends \Jiny\Config\Driver
                 return $this->parser($string);  
 
             } else {
-                echo "Yaml 파일($path $name)이 없습니다.<br>"; 
+                //echo "Yaml 파일($path $name)이 없습니다.<br>"; 
+            }
 
-            }            
         } else {
             // 이름이 없습니다.
         }
@@ -53,6 +51,7 @@ class Yaml extends \Jiny\Config\Driver
     public function parser($string)
     {   
         if ($string) {
+            // 심포니 Yaml 부분 컨버팅
             return \Jiny\Config\Yaml\Yaml::parse($string);
         }        
     }
@@ -66,6 +65,7 @@ class Yaml extends \Jiny\Config\Driver
             return '';
         }
 
+        // 심포니 Yaml 부분 컨버팅
         return \Jiny\Config\Yaml\Yaml::dump($data);
     }
 

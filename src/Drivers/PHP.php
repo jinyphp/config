@@ -31,7 +31,6 @@ class PHP extends \Jiny\Config\Driver
      */
     public function load($name, $path=NULL)
     {
-        // \TimeLog::set(__METHOD__);
         if ($name) {
             if ($path) {
                 $filename = $path.$name.".php";
@@ -48,4 +47,8 @@ class PHP extends \Jiny\Config\Driver
             // 파일 이름이 없습니다.
         }
     }
+
+    /**
+     * 
+     */
 }
