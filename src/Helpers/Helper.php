@@ -8,13 +8,17 @@
  * file that was distributed with this source code.
  */
 use \Jiny\Core\Registry\Registry;
+use \Jiny\Config\Config;
+
+use Jiny\Filesystem\File;
 
 if (! function_exists('conf')) {
     /**
      * 설정값을 읽어옵니다.
      */
-    function conf(string $key=NULL, $value=NULL) {        
-        if ($conf = Registry::get("CONFIG")) {
+    function conf(string $key=NULL, $value=NULL) {       
+        //if ($conf = Registry::get("CONFIG")) {
+        if ($conf = Config::instance()) {
             if (func_num_args()) {
                 if ($value) {
                     return $conf->set($key, $value);
@@ -51,5 +55,46 @@ if (! function_exists('config_set')) {
     {
         $conf = config_init();
         $conf->set($key, $value);
+    }
+}
+
+// namespace Jiny;
+use \Jiny\Config\Drivers\Yaml;
+use \Jiny\Config\Drivers\INI;
+use \Jiny\Config\Drivers\JSON;
+
+if (! function_exists('yaml')) {
+    function yaml($filename) {
+        $yaml = Yaml::instance();
+        
+        $path = File::pathDir($filename);
+        $name = File::pathFileName($filename);
+     
+        return $yaml->load($name, $path);
+
+    }
+}
+
+if (! function_exists('ini')) {
+    function ini($filename) {
+        $ini = INI::instance();
+        
+        $path = File::pathDir($filename);
+        $name = File::pathFileName($filename);
+     
+        return $ini->load($name, $path);
+
+    }
+}
+
+if (! function_exists('json')) {
+    function json($filename) {
+        $json = JSON::instance();
+        
+        $path = File::pathDir($filename);
+        $name = File::pathFileName($filename);
+     
+        return $json->load($name, $path);
+
     }
 }

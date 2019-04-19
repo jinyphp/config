@@ -10,7 +10,9 @@
 
 namespace Jiny\Config;
 
-use \Jiny\Core\Base\File;
+// use \Jiny\Core\Base\File;
+
+use Jiny\Filesystem\File;
 
 /**
  * > 싱글톤
@@ -46,16 +48,19 @@ class Config
     public static function instance()
     {
         if (!isset(self::$_instance)) {
-                   
+             
             // 인스턴스를 생성합니다.
             // 자기 자신의 인스턴스를 생성합니다.                
             self::$_instance = new self();
+
+            
 
             // 드라이버를 인스턴스를 로드합니다.
             self::$_instance->Drivers['Yaml'] = new \Jiny\Config\Drivers\Yaml(self::$_instance);
             self::$_instance->Drivers['INI'] = new \Jiny\Config\Drivers\INI(self::$_instance);
             self::$_instance->Drivers['PHP'] = new \Jiny\Config\Drivers\PHP(self::$_instance);
 
+            
 
             // 시작위치를 지정합니다.
             self::$_instance->_config['ROOT'] = ROOT_PUBLIC;
@@ -64,8 +69,8 @@ class Config
             //프레임워크 설정파일을 읽어옵니다.
             // .env.php
             $intFile = ".env";
-            if(file_exists(ROOT.DS.$intFile.".php")){
-                self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->load($intFile, ROOT.DS);
+            if(file_exists(ROOT.File::DS.$intFile.".php")){
+                self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->load($intFile, ROOT.File::DS);
             } else {
                 echo "초기 환경파일 설정을 읽어 올수가 없습니다. <br>";
                 echo "시스템을 종료합니다.";

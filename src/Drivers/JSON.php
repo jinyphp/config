@@ -12,9 +12,9 @@ namespace Jiny\Config\Drivers;
 use Jiny\Filesystem\File;
 
 /**
- * ini 설정파일 드라이버
+ * ymal 설정파일 드라이버
  */
-class INI extends \Jiny\Config\Driver
+class JSON extends \Jiny\Config\Driver
 {
     /**
      * 인스턴스 저장 프로퍼티
@@ -44,27 +44,22 @@ class INI extends \Jiny\Config\Driver
         $this->Config = $conf;
     }
 
-    // ini 설정파일을 로드합니다.
     public function load($name, $path=NULL)
     {
         if ($name) {
-            if ($path) {
-                $filename = File::path($path).File::DS.$name.".ini";
+            if ($path && $path != ".") {
+                $filename = File::path($path).File::DS.$name.".json";
             } else {
-                $filename = $name.".ini";
+                $filename = $name.".json";
             }
 
             if ($str = File::read($filename)) {
-                return \parse_ini_string($str);  
+                return \json_decode($str, true);
             }
-          
+
         } else {
             // 이름이 없습니다.
         }
-
     }
 
-    /**
-     * 
-     */
 }
