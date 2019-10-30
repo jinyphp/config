@@ -14,6 +14,10 @@ namespace Jiny\Config;
 
 use Jiny\Filesystem\File;
 
+use \Jiny\Config\Drivers\Yaml;
+use \Jiny\Config\Drivers\INI;
+use \Jiny\Config\Drivers\JSON;
+
 /**
  * > 싱글톤
  * 설정파일을 읽어 처리합니다.
@@ -34,7 +38,7 @@ class Config
     /**
      * 인스턴스 저장 프로퍼티
      */
-    private static $_instance;
+    private static $Instance;
 
     /**
      * 드라이버 인스턴스를 관리하는 배열입니다.
@@ -47,43 +51,46 @@ class Config
      */
     public static function instance()
     {
-        if (!isset(self::$_instance)) {
+        if (!isset(self::$Instance)) {
              
             // 인스턴스를 생성합니다.
             // 자기 자신의 인스턴스를 생성합니다.                
-            self::$_instance = new self();
-
-            
+            self::$Instance = new self();
 
             // 드라이버를 인스턴스를 로드합니다.
-            self::$_instance->Drivers['Yaml'] = new \Jiny\Config\Drivers\Yaml(self::$_instance);
-            self::$_instance->Drivers['INI'] = new \Jiny\Config\Drivers\INI(self::$_instance);
-            self::$_instance->Drivers['PHP'] = new \Jiny\Config\Drivers\PHP(self::$_instance);
+            // self::$Instance->Drivers['Yaml'] = new \Jiny\Config\Drivers\Yaml(self::$Instance);
+            self::$Instance->Drivers['Yaml'] = Yaml::instance();
+            self::$Instance->Drivers['INI'] = new \Jiny\Config\Drivers\INI(self::$Instance);
+            self::$Instance->Drivers['PHP'] = new \Jiny\Config\Drivers\PHP(self::$Instance);
+      
 
             
 
             // 시작위치를 지정합니다.
-            self::$_instance->_config['ROOT'] = ROOT_PUBLIC;
+            self::$Instance->_config['ROOT'] = ROOT_PUBLIC;
 
 
             //프레임워크 설정파일을 읽어옵니다.
             // .env.php
             $intFile = ".env";
             if(file_exists(ROOT.File::DS.$intFile.".php")){
-                self::$_instance->_config['ENV'] = self::$_instance->Drivers['PHP']->load($intFile, ROOT.File::DS);
+                self::$Instance->_config['ENV'] = self::$Instance->Drivers['PHP']->load($intFile, ROOT.File::DS);
             } else {
                 echo "초기 환경파일 설정을 읽어 올수가 없습니다. <br>";
                 echo "시스템을 종료합니다.";
                 exit;
             }   
 
-            return self::$_instance;
+            return self::$Instance;
 
         } else {
             // 인스턴스가 중복
-            return self::$_instance; 
+            return self::$Instance; 
         }
     }
+
+
+
 
 
     /**
@@ -258,7 +265,7 @@ class Config
      */
     public function path()
     {
-        $path = conf("ENV.path.conf");
+        $path = \jiny\conf("ENV.path.conf");
         $path = rtrim($path, "/")."/";
         return ROOT.File::osPath($path); 
     }
