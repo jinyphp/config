@@ -4,7 +4,8 @@
     "keywords": [
         "jinyPHP",
         "framwork",
-        "config"
+        "config",
+        "Laravel"
     ],
     "homepage": "http://jiny.hojin.io",
     "type": "library",
@@ -19,6 +20,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">= 7.0",
+        "livewire/livewire": "^2.7",
         "jiny/filesystem": "^0.0.1"
     },
     "autoload": {
@@ -28,5 +30,12 @@
         "files": [
             "src/Helpers/Helper.php"
         ] 
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jiny\\Config\\JinyConfigServiceProvider"
+            ]
+        }
     }
 }
