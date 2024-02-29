@@ -4,7 +4,7 @@ namespace Jiny\Config\Http\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 
-class WireConfigPHP extends Component
+class WireConfigIni extends Component
 {
     use \Jiny\Config\Http\Livewire\Hook;
     use \Jiny\Config\Http\Livewire\Permit;
@@ -25,7 +25,7 @@ class WireConfigPHP extends Component
      */
     private function filename($filename)
     {
-        $path = config_path().DIRECTORY_SEPARATOR.$this->filename.".php";
+        $path = config_path().DIRECTORY_SEPARATOR.$this->filename.".ini";
         return $path;
     }
 
@@ -40,8 +40,14 @@ class WireConfigPHP extends Component
 
         if ($this->filename) {
             $path = $this->filename($this->filename);
+            $path = str_replace(['/','\\'],DIRECTORY_SEPARATOR,$path);
+            //dd($path);
+
             if (file_exists($path)) {
-                $this->forms = config( str_replace('/','.',$this->filename) );
+                $str = file_get_contents($path);
+                $this->forms = \parse_ini_string($str);
+                //$this->forms = config( str_replace('/','.',$this->filename) );
+                //dd($this->forms);
             }
         }
     }
@@ -55,7 +61,7 @@ class WireConfigPHP extends Component
             $controller->hookCreating($this);
         }
 
-        return view("jinytable::livewire.form");
+        return view("jiny-config::livewire.form");
     }
 
 
@@ -89,7 +95,8 @@ class WireConfigPHP extends Component
 
             // 설정값을 파일로 저장
             if ($this->filename) {
-                $file = $this->convToPHP($form);
+                //$file = $this->convToPHP($form);
+                $file = $this->array_to_ini_string($form);
 
                 // PHP 설정파일명
                 $path = $this->filename($this->filename);
@@ -114,22 +121,35 @@ class WireConfigPHP extends Component
         }
     }
 
+    /*
     public function convToPHP($form)
     {
         $str = json_encode($form, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
-
-        // php 배열형태로 변환
-        $str = str_replace('{',"[",$str);
-        $str = str_replace('}',"]",$str);
-        $str = str_replace('":',"\"=>",$str);
-        //$str = str_replace(',',",\r\n",$str);
-
-        $file = <<<EOD
-        <?php
         return $str;
-        EOD;
+    }
+    */
 
-        return $file;
+    private function array_to_ini_string($array, $parent = '')
+    {
+        $ini_string = '';
+        //dd($array);
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                // 재귀적으로 배열 내부를 처리합니다.
+                $section = empty($parent) ? $key : "$parent.$key";
+                $ini_string .= $this->array_to_ini_string($value, $section);
+            } else {
+                // 키와 값을 INI 형식에 맞게 추가합니다.
+                if($parent) {
+                    $ini_string .= "$parent.$key = $value\n";
+                } else {
+                    $ini_string .= "$key = $value\n";
+                }
+
+            }
+        }
+
+        return $ini_string;
     }
 
     public function clear()

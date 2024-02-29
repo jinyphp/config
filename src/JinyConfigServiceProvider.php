@@ -5,6 +5,9 @@ namespace Jiny\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\View\Compilers\BladeCompiler;
+
+use Livewire\Livewire;
 
 class JinyConfigServiceProvider extends ServiceProvider
 {
@@ -20,14 +23,18 @@ class JinyConfigServiceProvider extends ServiceProvider
 
 
 
+
     }
 
     public function register()
     {
         /* 라이브와이어 컴포넌트 등록 */
         $this->app->afterResolving(BladeCompiler::class, function () {
-            // Form => json 저장
-            Livewire::component('WireConfigPHP', \Jiny\Table\Http\Livewire\WireConfigPHP::class);
+            // Form 값을 파일로 저장
+            Livewire::component('WireConfigPHP', \Jiny\Config\Http\Livewire\WireConfigPHP::class);
+            Livewire::component('WireConfigJson', \Jiny\Config\Http\Livewire\WireConfigJson::class);
+            Livewire::component('WireConfigIni', \Jiny\Config\Http\Livewire\WireConfigIni::class);
+            Livewire::component('WireConfigYaml', \Jiny\Config\Http\Livewire\WireConfigYaml::class);
         });
     }
 }

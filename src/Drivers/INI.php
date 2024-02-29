@@ -27,7 +27,7 @@ class INI extends \Jiny\Config\Driver
     public static function instance()
     {
         if (!isset(self::$Instance)) {
-            // 자기 자신의 인스턴스를 생성합니다.                
+            // 자기 자신의 인스턴스를 생성합니다.
             self::$Instance = new self();
             return self::$Instance;
         }
@@ -55,9 +55,9 @@ class INI extends \Jiny\Config\Driver
             }
 
             if ($str = File::read($filename)) {
-                return \parse_ini_string($str);  
+                return \parse_ini_string($str);
             }
-          
+
         } else {
             // 이름이 없습니다.
         }
@@ -65,6 +65,6 @@ class INI extends \Jiny\Config\Driver
     }
 
     /**
-     * 
+     *
      */
 }

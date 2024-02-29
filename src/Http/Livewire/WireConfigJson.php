@@ -4,7 +4,7 @@ namespace Jiny\Config\Http\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 
-class WireConfigPHP extends Component
+class WireConfigJson extends Component
 {
     use \Jiny\Config\Http\Livewire\Hook;
     use \Jiny\Config\Http\Livewire\Permit;
@@ -25,7 +25,7 @@ class WireConfigPHP extends Component
      */
     private function filename($filename)
     {
-        $path = config_path().DIRECTORY_SEPARATOR.$this->filename.".php";
+        $path = config_path().DIRECTORY_SEPARATOR.$this->filename.".json";
         return $path;
     }
 
@@ -40,8 +40,14 @@ class WireConfigPHP extends Component
 
         if ($this->filename) {
             $path = $this->filename($this->filename);
+            $path = str_replace(['/','\\'],DIRECTORY_SEPARATOR,$path);
+
+
             if (file_exists($path)) {
-                $this->forms = config( str_replace('/','.',$this->filename) );
+                $str = file_get_contents($path);
+                $this->forms = json_decode($str,true); // 배열로 가지고 오기
+                //$this->forms = config( str_replace('/','.',$this->filename) );
+                //dd($this->forms);
             }
         }
     }
@@ -55,7 +61,7 @@ class WireConfigPHP extends Component
             $controller->hookCreating($this);
         }
 
-        return view("jinytable::livewire.form");
+        return view("jiny-config::livewire.form");
     }
 
 
@@ -117,19 +123,7 @@ class WireConfigPHP extends Component
     public function convToPHP($form)
     {
         $str = json_encode($form, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
-
-        // php 배열형태로 변환
-        $str = str_replace('{',"[",$str);
-        $str = str_replace('}',"]",$str);
-        $str = str_replace('":',"\"=>",$str);
-        //$str = str_replace(',',",\r\n",$str);
-
-        $file = <<<EOD
-        <?php
         return $str;
-        EOD;
-
-        return $file;
     }
 
     public function clear()
