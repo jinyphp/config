@@ -1,9 +1,9 @@
 <?php
+namespace Jiny\Config\Http\Trait;
+
 /**
  * Hook를 검색 처리합니다.
  */
-namespace Jiny\Config\Http\Livewire;
-
 trait Hook
 {
     // 후크 메소드가 존재하는지 검사합니다.

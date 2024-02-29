@@ -22,6 +22,7 @@
         "php": ">= 7.0",
         "livewire/livewire": "^2.7",
         "symfony/yaml": "^6.4",
+        "jiny/laravel": "^0.0.2",
         "jiny/filesystem": "^0.0.1"
     },
     "autoload": {

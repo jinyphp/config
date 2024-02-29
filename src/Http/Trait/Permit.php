@@ -1,5 +1,5 @@
 <?php
-namespace Jiny\Config\Http\Livewire;
+namespace Jiny\Config\Http\Trait;
 
 use Illuminate\Support\Facades\Auth;
 

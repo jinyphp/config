@@ -1,5 +1,5 @@
 <?php
-namespace Jiny\Config\Http\Controllers;
+namespace Jiny\Config\Http\Trait;
 
 trait SetMenu
 {

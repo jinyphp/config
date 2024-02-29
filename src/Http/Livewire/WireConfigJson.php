@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Validator;
 
 class WireConfigJson extends Component
 {
-    use \Jiny\Config\Http\Livewire\Hook;
-    use \Jiny\Config\Http\Livewire\Permit;
+    use \Jiny\Config\Http\Trait\Hook;
+    use \Jiny\Config\Http\Trait\Permit;
 
     public $actions;
     public $filename;
@@ -61,7 +61,11 @@ class WireConfigJson extends Component
             $controller->hookCreating($this);
         }
 
-        return view("jiny-config::livewire.form");
+        $form_layout = "jiny-config::livewire.form-layout";
+        if(isset($this->actions['form_layout'])) {
+            $form_layout = $this->actions['form_layout'];
+        }
+        return view($form_layout);
     }
 
 

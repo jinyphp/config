@@ -7,12 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 
-
-use Jiny\Table\Http\Controllers\BaseController;
+use Jiny\Laravel\Http\Controllers\BaseController;
 class ConfigController extends BaseController
 {
-    use \Jiny\Config\Http\Livewire\Permit;       // 권환
-    use \Jiny\Config\Http\Controllers\SetMenu;   // 메뉴
+    use \Jiny\Config\Http\Trait\Permit;       // 권환
+    use \Jiny\Config\Http\Trait\SetMenu;   // 메뉴
 
     public function __construct()
     {
