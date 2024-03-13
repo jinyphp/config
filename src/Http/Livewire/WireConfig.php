@@ -4,10 +4,14 @@ namespace Jiny\Config\Http\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 
-class WireConfigPHP extends Component
+/**
+ * 입력 데이터를 php 설정파일로 저장합니다.
+ */
+
+class WireConfig extends Component
 {
-    use \Jiny\Config\Http\Trait\Hook;
-    use \Jiny\Config\Http\Trait\Permit;
+    use \Jiny\WireTable\Http\Trait\Hook;
+    use \Jiny\WireTable\Http\Trait\Permit;
 
     public $actions;
     public $filename;
@@ -21,7 +25,7 @@ class WireConfigPHP extends Component
     }
 
     /**
-     * 설정 파일명 얻기
+     * 설정 경로 얻기
      */
     private function filename($filename)
     {
@@ -55,11 +59,8 @@ class WireConfigPHP extends Component
             $controller->hookCreating($this);
         }
 
-        $form_layout = "jiny-config::livewire.form-layout";
-        if(isset($this->actions['form_layout'])) {
-            $form_layout = $this->actions['form_layout'];
-        }
-        return view($form_layout);
+        $view_layout = "jiny-config::livewire.form";
+        return view($view_layout);
     }
 
 
@@ -77,11 +78,18 @@ class WireConfigPHP extends Component
         if($this->permit['create'] || $this->permit['update']) {
             //유효성 검사
             if (isset($this->actions['validate'])) {
-                $validator = Validator::make($this->forms, $this->actions['validate'])->validate();
+                $validator = Validator::make(
+                    $this->forms,
+                    $this->actions['validate'])
+                ->validate();
             }
+
+
 
             #// $this->forms['created_at'] = date("Y-m-d H:i:s");
             $this->forms['updated_at'] = date("Y-m-d H:i:s");
+
+
 
             // Before Hook
             if ($controller = $this->isHook("hookStoring")) {
@@ -91,15 +99,11 @@ class WireConfigPHP extends Component
             }
 
 
+
             // 설정값을 파일로 저장
             if ($this->filename) {
+                $file = $this->convToPHP($form);
 
-                $str = $this->convToPHP($form);
-$file = <<<EOD
-<?php
-return $str;
-EOD;
-//dd($file);
                 // PHP 설정파일명
                 $path = $this->filename($this->filename);
 
@@ -116,6 +120,7 @@ EOD;
             }
 
         } else {
+            //dd("권환 없음");
             $this->popupPermitOpen();
 
             // 다시 데이터 로딩...
@@ -123,9 +128,8 @@ EOD;
         }
     }
 
-    public function convToPHP($form, $level=1)
+    public function convToPHP($form)
     {
-        /*
         $str = json_encode($form, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
 
         // php 배열형태로 변환
@@ -133,32 +137,14 @@ EOD;
         $str = str_replace('}',"]",$str);
         $str = str_replace('":',"\"=>",$str);
         //$str = str_replace(',',",\r\n",$str);
-        */
-        $str = "[\n"; //초기화
-        $lastKey = array_key_last($form);
-        //dump($lastKey);
-        foreach($form as $key => $value) {
-            for($i=0;$i<$level;$i++) $str .= "\t";
 
-            if(is_array($value)) {
-                $str .= "'$key'=>".''.$this->convToPHP($value,$level+1).'';
-            } else {
-                $str .= "'$key'=>".'"'.$value.'"';
-            }
-            
-            if($key != $lastKey) $str .= ",\n";
-        }
-
-        $str .= "\n";
-
-        if($level>1) {
-            for($i=0;$i<$level-1;$i++) $str .= "\t";
-        }
-
-        $str .= "]";
-        
-
+        $file = <<<EOD
+        <?php
         return $str;
+        EOD;
+
+
+        return $file;
     }
 
     public function clear()

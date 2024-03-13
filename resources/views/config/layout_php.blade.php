@@ -10,8 +10,10 @@
 
         @livewire('WireConfigPHP', ['actions'=>$actions])
 
-        {{-- Admin Rule Setting --}}
-        @include('jinytable::setActionRule')
+        {{-- SuperAdmin Actions Setting --}}
+        @if(Module::has('Actions'))
+            @livewire('setActionRule', ['actions'=>$actions])
+        @endif
 
     </x-theme-layout>
 </x-theme>

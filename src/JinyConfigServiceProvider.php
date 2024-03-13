@@ -21,9 +21,6 @@ class JinyConfigServiceProvider extends ServiceProvider
         // 데이터베이스
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-
-
-
     }
 
     public function register()
@@ -35,6 +32,9 @@ class JinyConfigServiceProvider extends ServiceProvider
             Livewire::component('WireConfigJson', \Jiny\Config\Http\Livewire\WireConfigJson::class);
             Livewire::component('WireConfigIni', \Jiny\Config\Http\Livewire\WireConfigIni::class);
             Livewire::component('WireConfigYaml', \Jiny\Config\Http\Livewire\WireConfigYaml::class);
+
+            // Form => json 저장
+            Livewire::component('WireConfig', \Jiny\Config\Http\Livewire\WireConfig::class);
         });
     }
 }

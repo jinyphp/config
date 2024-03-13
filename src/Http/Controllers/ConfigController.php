@@ -34,7 +34,6 @@ class ConfigController extends BaseController
         if($this->permit['read']) {
             $view = $this->checkEditView();
 
-
             return view($view,[
                 'actions' => $this->actions,
                 'request' => $request
@@ -52,14 +51,26 @@ class ConfigController extends BaseController
     private function checkEditView()
     {
         // 메인뷰 페이지...
-        if (isset($this->actions['view_main'])) {
-            if (view()->exists($this->actions['view_main'])) {
-                return $this->actions['view_main'];
+        if (isset($this->actions['view']['main'])) {
+            if (view()->exists($this->actions['view']['main'])) {
+                return $this->actions['view']['main'];
+            }
+        }
+
+        if (isset($this->actions['config']['type'])) {
+            switch($this->actions['config']['type']) {
+                case 'ini':
+                    return "jiny-config::config.layout_ini";
+                case 'ymal':
+                    return "jiny-config::config.layout_ymal";
+                case 'json':
+                    return "jiny-config::config.layout_json";
+                default:
             }
         }
 
         // config 수정
-        return "jiny-config::config.layout";
+        return "jiny-config::config.layout_php";
     }
 
 }

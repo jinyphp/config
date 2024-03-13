@@ -5,7 +5,7 @@
     <div class="card">
         <div class="card-body">
 
-            @includeIf($actions['view_form'])
+            @includeIf($actions['view']['form'])
 
 
             @if (isset($actions['id']))

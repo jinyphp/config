@@ -8,7 +8,7 @@
         @endif
         <!-- end -->
 
-        @livewire('WireConfigJson', ['actions'=>$actions])
+        @livewire('WireConfigYaml', ['actions'=>$actions])
 
         {{-- SuperAdmin Actions Setting --}}
         @if(Module::has('Actions'))
