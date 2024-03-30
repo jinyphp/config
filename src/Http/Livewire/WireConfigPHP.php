@@ -55,6 +55,8 @@ class WireConfigPHP extends Component
             $controller->hookCreating($this);
         }
 
+        //dd($this->forms);
+
         $form_layout = "jiny-config::livewire.form-layout";
         if(isset($this->actions['form_layout'])) {
             $form_layout = $this->actions['form_layout'];
@@ -143,9 +145,12 @@ EOD;
             if(is_array($value)) {
                 $str .= "'$key'=>".''.$this->convToPHP($value,$level+1).'';
             } else {
-                $str .= "'$key'=>".'"'.$value.'"';
+                //$str .= "'$key'=>".'"'.$value.'"';
+                $str .= "'$key'=>".'"'.addslashes($value).'"';
             }
-            
+
+            //dd($str);
+
             if($key != $lastKey) $str .= ",\n";
         }
 
@@ -156,7 +161,7 @@ EOD;
         }
 
         $str .= "]";
-        
+
 
         return $str;
     }
