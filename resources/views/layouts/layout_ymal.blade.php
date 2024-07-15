@@ -2,18 +2,19 @@
     {{-- 설정 파일을 생성할 수 있는 출력 템플릿 --}}
     <x-theme-layout>
 
-        <!-- Module Title Bar -->
-        @if(Module::has('Titlebar'))
-            @livewire('TitleBar', ['actions'=>$actions])
+        {{-- Title --}}
+        @if(isset($actions['view']['title']))
+            @includeIf($actions['view']['title'])
+        @else
+            @includeIf("jiny-wire-table::table_popup_forms.title")
         @endif
-        <!-- end -->
 
         @livewire('WireConfigYaml', ['actions'=>$actions])
 
         {{-- SuperAdmin Actions Setting --}}
-        @if(Module::has('Actions'))
+        {{-- @if(Module::has('Actions'))
             @livewire('setActionRule', ['actions'=>$actions])
-        @endif
+        @endif --}}
 
     </x-theme-layout>
 </x-theme>
