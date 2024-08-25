@@ -1,14 +1,40 @@
 <?php
-/*
- * This file is part of the jinyPHP package.
- *
- * (c) hojinlee <infohojin@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
-namespace Jiny;
+/**
+ * json 파일을 읽어 옵니다.
+ */
+if(!function_exists("json_file_decode")) {
+    function json_file_decode($file) {
+        $json = []; //
+
+        if(file_exists($file)) {
+            if($body = file_get_contents($file)) {
+                $json = json_decode($body,true);
+            }
+        }
+
+        return $json;
+    }
+};
+
+/**
+ * 배열을 json 파일로 저장합니다.
+ */
+if(!function_exists("json_file_encode")) {
+    function json_file_encode($file, $json) {
+        $str = json_encode($json,
+            JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+
+        file_put_contents($file, $str);
+
+        return $str;
+    }
+}
+
+
+
+
+//namespace Jiny;
 
 use \Jiny\Core\Registry\Registry;
 use \Jiny\Config\Config;
