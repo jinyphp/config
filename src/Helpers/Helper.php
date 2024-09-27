@@ -23,7 +23,7 @@ if(!function_exists("json_file_decode")) {
 if(!function_exists("json_file_encode")) {
     function json_file_encode($file, $json) {
         $str = json_encode($json,
-            JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+            JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         file_put_contents($file, $str);
 
