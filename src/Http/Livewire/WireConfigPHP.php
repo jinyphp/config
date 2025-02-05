@@ -13,11 +13,18 @@ class WireConfigPHP extends Component
     public $filename;
     public $redirect;
     public $forms=[];
+    public $message;
+
+    public $viewFile;
 
     public function mount()
     {
         $this->permitCheck();
         $this->configLoading();
+
+        if(!$this->viewFile) {
+            $this->viewFile = "jiny-config::admin.form";
+        }
     }
 
     /**
@@ -51,17 +58,17 @@ class WireConfigPHP extends Component
      */
     public function render()
     {
-        if ($controller = $this->isHook("hookCreating")) {
-            $controller->hookCreating($this);
-        }
+        // if ($controller = $this->isHook("hookCreating")) {
+        //     $controller->hookCreating($this);
+        // }
 
-        //dd($this->forms);
 
-        $form_layout = "jiny-config::livewire.form-layout";
-        if(isset($this->actions['form_layout'])) {
-            $form_layout = $this->actions['form_layout'];
-        }
-        return view($form_layout);
+        // $form_layout = "jiny-config::admin.form";
+        // if(isset($this->actions['form_layout'])) {
+        //     $form_layout = $this->actions['form_layout'];
+        // }
+
+        return view($this->viewFile);
     }
 
 
@@ -79,24 +86,30 @@ class WireConfigPHP extends Component
         if($this->permit['create'] || $this->permit['update']) {
             //유효성 검사
             if (isset($this->actions['validate'])) {
-                $validator = Validator::make($this->forms, $this->actions['validate'])->validate();
+                $validator = Validator::make(
+                    $this->forms,
+                    $this->actions['validate'])->validate();
             }
+
+            //dd($this->forms);
 
             #// $this->forms['created_at'] = date("Y-m-d H:i:s");
             $this->forms['updated_at'] = date("Y-m-d H:i:s");
 
             // Before Hook
-            if ($controller = $this->isHook("hookStoring")) {
-                $form = $controller->hookStoring($this, $this->forms);
-            } else {
-                $form = $this->forms;
-            }
+            // if ($controller = $this->isHook("hookStoring")) {
+            //     $form = $controller->hookStoring($this, $this->forms);
+            // } else {
+            //     $form = $this->forms;
+            // }
 
 
             // 설정값을 파일로 저장
             if ($this->filename) {
 
-                $str = $this->convToPHP($form);
+                $str = $this->convToPHP($this->forms);
+                //dd($str);
+
 $file = <<<EOD
 <?php
 return $str;
@@ -107,15 +120,17 @@ EOD;
 
                 // 설정 디렉터리 검사
                 $info = pathinfo($path);
-                if(!is_dir($info['dirname'])) mkdir($info['dirname'],0755, true);
+                if(!is_dir($info['dirname'])) {
+                    mkdir($info['dirname'],0755, true);
+                }
 
                 file_put_contents($path, $file);
             }
 
             // After Hook
-            if ($controller = $this->isHook("hookStored")) {
-                $controller->hookStored($this, $form);
-            }
+            // if ($controller = $this->isHook("hookStored")) {
+            //     $controller->hookStored($this, $form);
+            // }
 
         } else {
             $this->popupPermitOpen();
@@ -127,29 +142,19 @@ EOD;
 
     public function convToPHP($form, $level=1)
     {
-        /*
-        $str = json_encode($form, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+        //dump($form);
 
-        // php 배열형태로 변환
-        $str = str_replace('{',"[",$str);
-        $str = str_replace('}',"]",$str);
-        $str = str_replace('":',"\"=>",$str);
-        //$str = str_replace(',',",\r\n",$str);
-        */
         $str = "[\n"; //초기화
         $lastKey = array_key_last($form);
-        //dump($lastKey);
+
         foreach($form as $key => $value) {
             for($i=0;$i<$level;$i++) $str .= "\t";
 
             if(is_array($value)) {
                 $str .= "'$key'=>".''.$this->convToPHP($value,$level+1).'';
             } else {
-                //$str .= "'$key'=>".'"'.$value.'"';
                 $str .= "'$key'=>".'"'.addslashes($value).'"';
             }
-
-            //dd($str);
 
             if($key != $lastKey) $str .= ",\n";
         }
